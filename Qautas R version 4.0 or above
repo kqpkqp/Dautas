@@ -1,0 +1,30 @@
+setwd("/Users/seki/3.experiment/distance/test6_2/")
+traindata <-read.csv("3.3.3.4_TrainingDataSample.csv", header=TRUE)
+  
+traindata$Label <- as.factor(traindata$Label) 
+### If you are using R version 4.0 or above, please enter this code.###
+ 
+install.packages("randomForest")
+library(randomForest)
+ 
+rand <- sample(nrow(traindata), nrow(traindata)*0.5)
+learnData <- traindata[rand,2:11]
+testData <- traindata[-rand,2:11] 
+ 
+forest <- randomForest(Label~.,data= learnData) 
+
+pred.forest <- predict(forest, newdata = testData, type ="class") 
+ 
+AccuracyTable<-table(pred.forest, testData$Label)
+(AccuracyTable[1,1]+AccuracyTable[2,2])/sum(AccuracyTable)
+ 
+QData <-read.csv("WT_Atg8_Results.csv", header=TRUE)
+pred.forest <- predict(forest, newdata = QData, type ="class", header =TRUE)
+QData <- transform(QData, Label2= pred.forest)
+head(QData)
+write.csv(QData, "/Users/seki/experiment/distance/20190823/result.csv", row.names=TRUE, quote=TRUE)
+ 
+wt.el <- subset(QData, QData$Label2 == "elongated")
+wt.el
+write.csv(wt.el, "/Users/seki/3.experiment/distance/test/WT_qautas.csv", row.names=TRUE, quote=TRUE)
+
